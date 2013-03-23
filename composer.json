@@ -1,0 +1,19 @@
+{
+	"name": "uam/propel-s3object-behavior",
+	"description": "A Propel behavior that allows objects to save a file to AWS S3.",
+	"keywords": ["AWS", "S3", "cloud", "propel", "behavior"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Olivier Pichon",
+			"email": "op@united-asian.com"
+		}
+	],
+	"require": {
+		"propel/propel1": "1.6.*",
+		"aws/aws-sdk-php": "2.2.*@dev"
+	},
+	"autload": {
+		"classmap": ["src/"]
+	}
+}
