@@ -1,7 +1,5 @@
 <?php
 
-namespace UAM\Bundle\AwsBundle\Propel;
-
 class S3ObjectBehaviorObjectBuilderModifier
 {
 	protected $behavior, $builder;

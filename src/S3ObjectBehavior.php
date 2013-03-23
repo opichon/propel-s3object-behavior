@@ -1,7 +1,5 @@
 <?php
 
-namespace UAM\Bundle\AwsBundle\Propel;
-
 use \Behavior;
 
 class S3ObjectBehavior extends Behavior{
