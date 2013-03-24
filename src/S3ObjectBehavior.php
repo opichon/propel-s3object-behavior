@@ -10,7 +10,11 @@ class S3ObjectBehavior extends Behavior{
 		'key_column' => 'key',
 		'original_filename_column' => 'original_filename',
 		'default_region' => null,
-		'default_bucket' => null
+		'default_bucket' => null,
+		'sse_column' => 'sse',
+		'default_sse' => null,
+		'rrs_column' => 'rrs',
+		'default_rrs' => null
 	);
 
 	protected $objectBuilderModifier;
@@ -67,6 +71,28 @@ class S3ObjectBehavior extends Behavior{
 				'name' => $columnName,
 				'type' => 'VARCHAR',
 				'size' => 100
+			));
+		}
+
+		$columnName = $this->getParameter('sse_column');
+		// add the column if not present
+		if(!$this->getTable()->containsColumn($columnName)) {
+			$column = $this->getTable()->addColumn(array(
+				'name' => $columnName,
+				'type' => 'TINYINT',
+				'size' => 1,
+				'default' => $this->getParameter('default_sse')
+			));
+		}
+
+		$columnName = $this->getParameter('rrs_column');
+		// add the column if not present
+		if(!$this->getTable()->containsColumn($columnName)) {
+			$column = $this->getTable()->addColumn(array(
+				'name' => $columnName,
+				'type' => 'TINYINT',
+				'size' => 1,
+				'default' => $this->getParameter('default_rrs')
 			));
 		}
 	}

@@ -34,6 +34,9 @@ class S3ObjectBehaviorObjectBuilderModifier
 		$this->setBuilder($builder);
 		$script = '';
 
+		$this->addGetServerSideEncryptionMethod($script);
+		$this->addGetReducedRedundancyStorageMethod($script);
+
 		$this->addGetPresignedUrlMethod($script);
 		$this->addUploadMethod($script);
 		$this->addSanitizeFilenameMEthod($script);
@@ -41,6 +44,32 @@ class S3ObjectBehaviorObjectBuilderModifier
 		return $script;
 	}
 
+	protected function addGetServerSideEncryptionMethod(&$script)
+	{
+		$script .= "
+/**
+ * Whether this object's document should be stored on S3 using server-side server-side encryption.
+ */
+public function getServerSideEncryption()
+{
+	return \$this->get" . $this->behavior->getColumnForParameter('sse_column')->getPhpName() . "();
+}
+";
+	}
+
+	protected function addGetReducedRedundancyStorageMethod(&$script)
+	{
+		$script .= "
+/**
+ * Whether this object's document should be stored on S3 using reduced redundancy storage.
+ */
+public function getReducedRedundancyStorage()
+{
+	return \$this->get" . $this->behavior->getColumnForParameter('rrs_column')->getPhpName() . "();
+}
+";
+	}
+	
 	protected function addGetPresignedUrlMethod(&$script)
 	{
 		$script .= "
