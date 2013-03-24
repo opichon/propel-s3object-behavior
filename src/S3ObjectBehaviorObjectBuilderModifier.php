@@ -15,15 +15,26 @@ class S3ObjectBehaviorObjectBuilderModifier
 		$this->builder->declareClasses(
 			'Aws\\S3\\S3Client',
 			'Aws\\S3\\Enum\\CannedAcl',
-			'Aws\\S3\\Exception\\S3Exception'
+			'Aws\\S3\\Exception\\S3Exception',
+			'\\S3Object',
+			'\\S3ObjectManager'
 		);
+	}
+
+	public function objectFilter(&$script)
+	{
+		$pattern = '/abstract class (\w+) extends (\w+) implements (\w+)/i';
+		$replace = 'abstract class ${1} extends ${2} implements ${3}, S3Object';
+		$script = preg_replace($pattern, $replace, $script);
 	}
 
 	public function objectMethods($builder)
 	{
-
 		$this->setBuilder($builder);
 		$script = '';
+
+		$this->addGetServerSideEncryptionMethod($script);
+		$this->addGetReducedRedundancyStorageMethod($script);
 
 		$this->addGetPresignedUrlMethod($script);
 		$this->addUploadMethod($script);
@@ -32,27 +43,55 @@ class S3ObjectBehaviorObjectBuilderModifier
 		return $script;
 	}
 
+	protected function addGetServerSideEncryptionMethod(&$script)
+	{
+		$script .= "
+/**
+ * Whether this object's document should be stored on S3 using server-side server-side encryption.
+ */
+public function getServerSideEncryption()
+{
+	return \$this->get" . $this->behavior->getColumnForParameter('sse_column')->getPhpName() . "();
+}
+";
+	}
+
+	protected function addGetReducedRedundancyStorageMethod(&$script)
+	{
+		$script .= "
+/**
+ * Whether this object's document should be stored on S3 using reduced redundancy storage.
+ */
+public function getReducedRedundancyStorage()
+{
+	return \$this->get" . $this->behavior->getColumnForParameter('rrs_column')->getPhpName() . "();
+}
+";
+	}
+	
 	protected function addGetPresignedUrlMethod(&$script)
 	{
 		$script .= "
 /**
  * Returns a pre-signed url to the document on AWS S3.
  *
- * @param Aws\S3\S3Client a S3Client instance
- * @param int|string $expires The Unix timestamp to expire at or a string that can be evaluated by strtotime
+ * @param S3ObjectManager a S3 object manager
+ * @param int|string \$expires The Unix timestamp to expire at or a string that can be evaluated by strtotime
  *
  * @return string
  * @throws InvalidArgumentException if the request is not associated with this client object  
  */
-public function getPresignedUrl(S3Client \$s3, \$expires = \"+5 minutes\")
+public function getPresignedUrl(S3ObjectManager \$manager, \$expires = \"+5 minutes\")
 {
+	\$s3 = \$manager->getS3Client(\$this);
+
 	if (\$region = \$this->getRegion()) {
-		\$s3->setRegion($region);
+		\$s3->setRegion(\$region);
 	}
 
 	\$url = sprintf(
 		'%s/%s?response-content-disposition=attachment; filename=\"%s\"',
-		\$this->getBucket(),
+		\$manager->getBucket(\$this),
 		\$this->getKey(),
 		\$this->getOriginalFilename()
 	);
@@ -70,28 +109,32 @@ public function getPresignedUrl(S3Client \$s3, \$expires = \"+5 minutes\")
 /**
  * Uploads a file to S3.
  *
- * @param Aws\S3\S3Client an Aws S3Client
+ * @param S3ObjectManager an S3ObjectManager instance
  * @param string|stream|Guzzle\Http\EntityBody the path to the file to upload; accepts any valid argument for the 'Body' parameter passed to the S3Client::putObject method.
  * @param string the AWS S3 bucket to upload this file to. If unset, this instance's 'bucket' property will be used.
  *
  * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
  * @throws S3Exception if the request fails
  */
-public function upload(S3Client \$s3, \$file, \$bucket = null)
+public function upload(\\S3ObjectManager \$manager, \$file)
 {
 	if (!\$file) {
 		return; 
 	}
+
+	\$s3 = \$manager->getS3Client(\$this);
 
 	if (\$region = \$this->getRegion()) {
 		\$s3->setRegion(\$region);
 	}
 
 	\$response = \$s3->putObject(array(
-		'Bucket' => \$bucket ? \$bucket : \$this->getBucket(),
+		'Bucket' => \$manager->getBucket(\$this),
 		'Key'    => \$this->getKey(),
 		'Body'   => \$file,
-		'ACL'    => CannedAcl::PRIVATE_ACCESS
+		'ACL'    => CannedAcl::PRIVATE_ACCESS,
+		'ServerSideEncryption' => \$manager->getServerSideEncryption() ? 'AES256' : null,
+		'StorageClass' => \$manager->getReducedRedundancyStorage() ? 'REDUCED_REDUNDANCY' : 'STANDARD'
 	));
 
 	return \$response;
