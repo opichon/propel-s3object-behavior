@@ -19,4 +19,14 @@ interface S3ObjectManager
 	 * @return string
 	 */
 	public function getBucket(S3Object $object);
+
+	/**
+	 * Whether the object should store its document on S3 using server-side encryption.
+	 */
+	public function getServerSideEncryption(S3Object $object = null);
+
+	/**
+	 * Whether the object should store its document on S3 using reduced redundancy storage.
+	 */
+	public function getReduceRedundancyStorage(S3Object $object);	
 }
