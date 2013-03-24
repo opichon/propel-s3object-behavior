@@ -27,10 +27,9 @@ class S3ObjectBehaviorObjectBuilderModifier
 		$replace = 'abstract class ${1} extends ${2} implements ${3}, S3Object';
 		$script = preg_replace($pattern, $replace, $script);
 	}
-	
+
 	public function objectMethods($builder)
 	{
-
 		$this->setBuilder($builder);
 		$script = '';
 
@@ -134,7 +133,8 @@ public function upload(\\S3ObjectManager \$manager, \$file)
 		'Key'    => \$this->getKey(),
 		'Body'   => \$file,
 		'ACL'    => CannedAcl::PRIVATE_ACCESS,
-		'ServerSideEncryption' => 'AES256'
+		'ServerSideEncryption' => \$manager->getServerSideEncryption() ? 'AES256' : null,
+		'StorageClass' => \$manager->getReducedRedundancyStorage() ? 'REDUCED_REDUNDANCY' : 'STANDARD'
 	));
 
 	return \$response;

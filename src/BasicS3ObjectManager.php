@@ -82,7 +82,7 @@ class BasicS3ObjectManager implements S3ObjectManager
 		}		
 	}
 
-	public function getReduceRedundancyStorage(S3Object $object)
+	public function getReducedRedundancyStorage(S3Object $object = null)
 	{
 		if ($object === null) {
 			return $this->rrs;
