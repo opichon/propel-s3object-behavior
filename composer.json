@@ -11,14 +11,14 @@
 	],
 	"require": {
 		"propel/propel1": "1.6.*",
-		"aws/aws-sdk-php": "2.2.*@dev"
+		"aws/aws-sdk-php": "2.3.*@dev"
 	},
 	"autoload": {
 		"classmap": ["src/"]
 	},
     "extra": {
         "branch-alias": {
-            "dev-master": "0.1.x-dev"
+            "dev-master": "0.2.x-dev"
         }
     }
 }
