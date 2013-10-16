@@ -10,8 +10,8 @@
 		}
 	],
 	"require": {
-		"propel/propel1": "1.6.*",
-		"aws/aws-sdk-php": "2.3.*@dev"
+		"propel/propel1": "~1.6",
+		"aws/aws-sdk-php": "~2.3"
 	},
 	"autoload": {
 		"classmap": ["src/"]
