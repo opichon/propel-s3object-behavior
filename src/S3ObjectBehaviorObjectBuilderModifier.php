@@ -111,7 +111,6 @@ public function getPresignedUrl(S3ObjectManager \$manager, \$expires = \"+5 minu
  *
  * @param S3ObjectManager an S3ObjectManager instance
  * @param string|stream|Guzzle\Http\EntityBody the path to the file to upload; accepts any valid argument for the 'Body' parameter passed to the S3Client::putObject method.
- * @param string the AWS S3 bucket to upload this file to. If unset, this instance's 'bucket' property will be used.
  *
  * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
  * @throws S3Exception if the request fails
@@ -142,6 +141,45 @@ public function upload(\\S3ObjectManager \$manager, \$file)
 ";
     }
 
+    protected function addUploadMethod(&$script)
+    {
+        $script .= "
+/**
+ * Deletes the associated file on S3.
+ *
+ * @param S3ObjectManager an S3ObjectManager instance
+ *
+ * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
+ * @throws S3Exception if the request fails
+ */
+public function deleteFile(\\S3ObjectManager \$manager)
+{
+    if (!\$this->getKey()) {
+        return;
+    }
+
+    \$s3 = \$manager->getS3Client(\$this);
+
+    \$s3->registerStreamWrapper();
+
+    if (!file_exists(sprintf('s3://%s/%s', \$manager->getBucket(\$this), \$this->getKey()))) {
+        return;
+    }
+
+    if (\$region = \$this->getRegion()) {
+        \$s3->setRegion(\$region);
+    }
+
+    \$response = \$s3->deleteObject(array(
+        'Bucket' => \$manager->getBucket(\$this),
+        'Key'    => \$this->getKey()
+    ));
+
+    return \$response;
+}
+";
+    }
+
     protected function addSanitizeFilenameMethod(&$script)
     {
         $script .= "
@@ -155,7 +193,7 @@ public function upload(\\S3ObjectManager \$manager, \$file)
     \$s = preg_replace('/[.]*\$/', '', \$s); // remove trailing periods
     \$s = preg_replace('/\.[.]+/', '.', \$s); // remove any consecutive periods
 
-    // replace dodhy characters
+    // replace dodgy characters
     \$dodgychars = '[^0-9a-zA-Z\\.()_-]'; // allow only alphanumeric, underscore, parentheses, hyphen and period
     \$s = preg_replace('/' . \$dodgychars . '/', '_', \$s); // replace dodgy characters
 

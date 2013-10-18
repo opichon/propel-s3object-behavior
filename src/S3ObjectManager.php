@@ -3,7 +3,7 @@
 interface S3ObjectManager
 {
     /**
-     * Returns the S3Client to use for cummunicating with the AWS S3 service.
+     * Returns the S3Client to use for communicating with the AWS S3 service.
      *
      * @param S3Object a document
      *
