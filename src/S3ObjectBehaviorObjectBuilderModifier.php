@@ -64,6 +64,8 @@ protected \$key_marked_for_deletion;
         $this->addDeleteFileMethod($script);
         $this->addGetS3ObjectManagerMethod($script);
         $this->addSetS3ObjectManagerMethod($script);
+        $this->addGetPathnameMethod($script);
+        $this->addSetPathnameMethod($script);
 
         $this->addSanitizeFilenameMethod($script);
 
@@ -180,7 +182,7 @@ public function deleteFile(\\S3ObjectManager \$manager = null)
     {
         $script .= "
 /**
- * Returns the S3ObjectManager instance assocaited with this object, if there is one.
+ * Returns the S3ObjectManager instance associated with this object, if there is one.
  *
  * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
  */
@@ -195,12 +197,40 @@ public function getS3ObjectManager()
     {
         $script .= "
 /**
- * Sets the S3ObjectManager instance assocaited with this object.
+ * Sets the S3ObjectManager instance associated with this object.
  *
  */
 public function setS3ObjectManager(S3ObjectManager \$manager)
 {
     \$this->s3object_manager = \$manager;
+}
+";
+    }
+
+    protected function addGetPathnameMethod(&$script)
+    {
+        $script .= "
+/**
+ * Returns the local path to the file associated with this object, if there is one.
+ *
+ */
+public function getPathname()
+{
+    return \$this->pathname;
+}
+";
+    }
+
+    protected function addSetPathnameMethod(&$script)
+    {
+        $script .= "
+/**
+ * Sets the local path to the file associated with this object.
+ *
+ */
+public function setPathname(\$pathname)
+{
+    \$this->pathname = \$pathname;
 }
 ";
     }
