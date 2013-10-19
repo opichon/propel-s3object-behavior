@@ -31,7 +31,13 @@ class S3ObjectBehaviorObjectBuilderModifier
 
         return "
 /**
- * S3ObjectManager instance assocaited with this object
+ * Path to upload file
+ * @var        string
+ */
+protected \$pathname;
+
+/**
+ * S3ObjectManager instance associated with this object
  * @var        S3ObjectManager
  */
 protected \$s3object_manager;
@@ -189,6 +195,16 @@ public function getS3ObjectManager()
 public function setS3ObjectManager(S3ObjectManager \$manager)
 {
     \$this->s3object_manager = \$manager;
+}
+";
+    }
+
+    public function postDelete($builder)
+    {
+        $peerClassname = $builder->getStubPeerBuilder()->getClassname();
+
+        return "if (\$this->pathname) {
+    \$this->uploadFile(\$this->pathname);
 }
 ";
     }
