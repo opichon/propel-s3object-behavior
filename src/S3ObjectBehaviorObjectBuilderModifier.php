@@ -23,6 +23,9 @@ class S3ObjectBehaviorObjectBuilderModifier
         $pattern = '/abstract class (\w+) extends (\w+) implements (\w+)/i';
         $replace = 'abstract class ${1} extends ${2} implements ${3}, S3Object';
         $script = preg_replace($pattern, $replace, $script);
+
+        $pattern = '/function setOriginalFilename()/';
+        $script = preg_replace($pattern, '', $script);
     }
 
     public function objectAttributes($builder)
