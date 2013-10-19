@@ -104,7 +104,7 @@ public function getPresignedUrl(\$expires = \"+5 minutes\", S3ObjectManager \$ma
     }
 
     if (!\$manager) {
-        throw new \\RuntimeException('No S3ObjectManager instance found.')
+        throw new \\RuntimeException('No S3ObjectManager instance found.');
     }
 
     return \$manager->getPresignedUrl(\$this, \$expires);
@@ -131,7 +131,7 @@ public function upload(\$file, \\S3ObjectManager \$manager = null)
     }
 
     if (!\$manager) {
-        throw new \\RuntimeException('No S3ObjectManager instance found.')
+        throw new \\RuntimeException('No S3ObjectManager instance found.');
     }
 
     return \$manager->uploadFile(\$this, \$file);
@@ -157,7 +157,7 @@ public function deleteFile(\\S3ObjectManager \$manager = null)
     }
 
     if (!\$manager) {
-        throw new \\RuntimeException('No S3ObjectManager instance found.')
+        throw new \\RuntimeException('No S3ObjectManager instance found.');
     }
 
     return \$manager->deleteFile(\$this);
