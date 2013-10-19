@@ -189,7 +189,7 @@ class BasicS3ObjectManager implements S3ObjectManager
      * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
      * @throws S3Exception if the request fails
      */
-    public function deleteFile(S3Object)
+    public function deleteFile(S3Object $object)
     {
         $bucket = $this->getBucket($object);
 
