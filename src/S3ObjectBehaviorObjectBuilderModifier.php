@@ -42,6 +42,12 @@ protected \$pathname;
  */
 protected \$s3object_manager;
 
+/**
+ * Key for previous version of file, to be deleted
+ * @var        string
+ */
+protected \$key_marked_for_deletion;
+
 ";
     }
 
@@ -199,12 +205,22 @@ public function setS3ObjectManager(S3ObjectManager \$manager)
 ";
     }
 
+    public function postSave($builder)
+    {
+        $peerClassname = $builder->getStubPeerBuilder()->getClassname();
+
+        return "if (\$this->pathname && \$this->getS3ObjectManager()) {
+    \$this->upload(\$this->pathname);
+}
+";
+    }
+
     public function postDelete($builder)
     {
         $peerClassname = $builder->getStubPeerBuilder()->getClassname();
 
-        return "if (\$this->pathname) {
-    \$this->uploadFile(\$this->pathname);
+        return "if (\$this->getS3ObjectManager()) {
+    \$this->deleteFile();
 }
 ";
     }
