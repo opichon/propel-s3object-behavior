@@ -201,9 +201,7 @@ class BasicS3ObjectManager implements S3ObjectManager
 
         $s3 = $this->getS3Client($object);
 
-        $s3->registerStreamWrapper();
-
-        if (!file_exists(sprintf('s3://%s/%s', $bucket, $key))) {
+        if (!$s3->doesObjectExist($bucket, $key))) {
             return;
         }
 
