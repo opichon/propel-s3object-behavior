@@ -264,7 +264,7 @@ public function setPathname(\$pathname)
 
 if (\$generated_key != \$this->getKey() && \$this->getS3ObjectManager()) {
     \$this->deleteFile();
-    \$this->setKey($generated_key);
+    \$this->setKey(\$generated_key);
 }
 ";
     }
