@@ -37,4 +37,6 @@ interface S3ObjectManager
     public function deleteFile(S3Object $object);
 
     public function fileExists(S3Object $object);
+
+    public function generateKey(S3Object $object);
 }

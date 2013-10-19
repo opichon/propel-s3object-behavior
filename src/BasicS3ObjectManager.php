@@ -113,6 +113,19 @@ class BasicS3ObjectManager implements S3ObjectManager
     }
 
     /**
+     * Generates a new key for the object to use in AWS S3.
+     * This implementation will return the object's slugified original filename.
+     *
+     * @return string
+     */
+    public function generateKey(S3Object $object)
+    {
+        $slugify = new Slugify(Slugify::MODEARRAY);
+
+        return $slugify->slugify($object->getOrignalFilename());
+    }
+
+    /**
      * Returns the key for the object to use in AWS S3.
      * This implementation will first check whether the object itself defines a key,
      * and use that if it does. OTherwise, by default, it will return the object's

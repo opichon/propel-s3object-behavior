@@ -23,9 +23,6 @@ class S3ObjectBehaviorObjectBuilderModifier
         $pattern = '/abstract class (\w+) extends (\w+) implements (\w+)/i';
         $replace = 'abstract class ${1} extends ${2} implements ${3}, S3Object';
         $script = preg_replace($pattern, $replace, $script);
-
-        $pattern = '/function setOriginalFilename()/';
-        $script = preg_replace($pattern, '', $script);
     }
 
     public function objectAttributes($builder)
@@ -44,12 +41,6 @@ protected \$pathname;
  * @var        S3ObjectManager
  */
 protected \$s3object_manager;
-
-/**
- * Key for previous version of file, to be deleted
- * @var        string
- */
-protected \$key_marked_for_deletion;
 
 ";
     }
@@ -70,7 +61,7 @@ protected \$key_marked_for_deletion;
         $this->addGetPathnameMethod($script);
         $this->addSetPathnameMethod($script);
         $this->addFileExistsMethod($script);
-
+        $this->addGenerateKeyMethod($script);
         $this->addSanitizeFilenameMethod($script);
 
         return $script;
@@ -98,6 +89,32 @@ public function getServerSideEncryption()
 public function getReducedRedundancyStorage()
 {
     return \$this->get" . $this->behavior->getColumnForParameter('rrs_column')->getPhpName() . "();
+}
+";
+    }
+
+    protected function addGenerateKeyMethod(&$script)
+    {
+        $script .= "
+/**
+ * Returns a key for the associated file on AWS S3.
+ *
+ * @param S3ObjectManager a S3 object manager
+ *
+ * @return string
+ * @throws InvalidArgumentException if the request is not associated with this client object
+ */
+public function generateKey(S3ObjectManager \$manager = null)
+{
+    if (\$manager == null) {
+        \$manager = \$this->getS3ObjectManager();
+    }
+
+    if (!\$manager) {
+        throw new \\RuntimeException('No S3ObjectManager instance found.');
+    }
+
+    return \$manager->generateKey(\$this);
 }
 ";
     }
@@ -235,6 +252,18 @@ public function getPathname()
 public function setPathname(\$pathname)
 {
     \$this->pathname = \$pathname;
+}
+";
+    }
+
+    public function preSave($builder)
+    {
+        $peerClassname = $builder->getStubPeerBuilder()->getClassname();
+
+        return "\$generated_key = \$this->generateKey();
+
+if (\$generated_key != \$this->getKey() && \$this->getS3ObjectManager()) {
+    \$this->deleteFile();
 }
 ";
     }
