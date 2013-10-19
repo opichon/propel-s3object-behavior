@@ -33,7 +33,7 @@ class BasicS3ObjectManager implements S3ObjectManager
             : $serverSideEncryption;
 
         $this->rrs = null === $reducedRedundancyStorage
-            ? statif::OFF_DEFAULT
+            ? static::OFF_DEFAULT
             : $reducedRedundancyStorage;
     }
 
