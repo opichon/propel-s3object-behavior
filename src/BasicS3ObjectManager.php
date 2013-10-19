@@ -45,7 +45,7 @@ class BasicS3ObjectManager implements S3ObjectManager
         return $this->s3;
     }
 
-    public function getRegion(S3Object $object)
+    public function getRegion(S3Object $object = null)
     {
         if (null === $object) {
             return $this->region;
