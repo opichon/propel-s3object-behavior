@@ -66,6 +66,7 @@ protected \$key_marked_for_deletion;
         $this->addSetS3ObjectManagerMethod($script);
         $this->addGetPathnameMethod($script);
         $this->addSetPathnameMethod($script);
+        $this->addFileExistsMethod($script);
 
         $this->addSanitizeFilenameMethod($script);
 
@@ -253,6 +254,27 @@ public function setPathname(\$pathname)
     \$this->deleteFile();
 }
 ";
+    }
+
+    protected function addFileExistsMethod(&$script)
+    {
+        $script .= "
+/**
+ * Checks whether the file associated with this document exists on AWS S3.
+ */
+ public function fileExists(\\S3ObjectManager \$manager = null)
+ {
+    if (\$manager == null) {
+        \$manager = \$this->getS3ObjectManager();
+    }
+
+    if (!\$manager) {
+        throw new \\RuntimeException('No S3ObjectManager instance found.');
+    }
+
+    return \$manager->fileExists(\$this);
+
+}";
     }
 
     protected function addSanitizeFilenameMethod(&$script)

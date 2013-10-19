@@ -216,4 +216,19 @@ class BasicS3ObjectManager implements S3ObjectManager
 
        return $response;
     }
+
+    public function fileExists(S3Object $object)
+    {
+        $bucket = $this->getBucket($object);
+
+        $key = $this->getKey($object);
+
+        if (empty($bucket) || empty($key)) {
+            return false;
+        }
+
+        $s3 = $this->getS3Client($object);
+
+        $s3->doesObjectExist($bucket, $key);
+    }
 }

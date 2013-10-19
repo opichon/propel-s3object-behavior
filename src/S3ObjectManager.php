@@ -35,4 +35,6 @@ interface S3ObjectManager
     public function uploadFile(S3Object $object, $file);
 
     public function deleteFile(S3Object $object);
+
+    public function fileExists(S3Object $object);
 }
