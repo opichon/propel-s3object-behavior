@@ -28,6 +28,20 @@ class S3ObjectBehaviorObjectBuilderModifier
         $script = preg_replace($pattern, $replace, $script);
     }
 
+    public function objectAttributes($builder)
+    {
+        $objectClassname = $builder->getStubObjectBuilder()->getClassname();
+
+        return "
+/**
+ * S3ObjectManager instance assocaited with this object
+ * @var        S3ObjectManager
+ */
+protected \$s3object_manager;
+
+";
+    }
+
     public function objectMethods($builder)
     {
         $this->setBuilder($builder);
@@ -38,7 +52,9 @@ class S3ObjectBehaviorObjectBuilderModifier
 
         $this->addGetPresignedUrlMethod($script);
         $this->addUploadMethod($script);
-        $this->addSanitizeFilenameMEthod($script);
+        $this->addDeleteFileMethod($script);
+
+        $this->addSanitizeFilenameMethod($script);
 
         return $script;
     }
@@ -81,24 +97,17 @@ public function getReducedRedundancyStorage()
  * @return string
  * @throws InvalidArgumentException if the request is not associated with this client object
  */
-public function getPresignedUrl(S3ObjectManager \$manager, \$expires = \"+5 minutes\")
+public function getPresignedUrl(\$expires = \"+5 minutes\", S3ObjectManager \$manager = null)
 {
-    \$s3 = \$manager->getS3Client(\$this);
-
-    if (\$region = \$this->getRegion()) {
-        \$s3->setRegion(\$region);
+    if (\$manager == null) {
+        $manager = \$this->getS3ObjectManager();
     }
 
-    \$url = sprintf(
-        '%s/%s?response-content-disposition=attachment; filename=\"%s\"',
-        \$manager->getBucket(\$this),
-        \$this->getKey(),
-        \$this->getOriginalFilename()
-    );
-    \$request = \$s3->get(\$url);
-    \$signed = \$s3->createPresignedUrl(\$request, \$expires);
+    if (!\$manager) {
+        throw new \\RuntimeException('No S3ObjectManager instance found.')
+    }
 
-    return \$signed;
+    return \$manager->getPresignedUrl(\$this, \$expires);
 }
 ";
     }
@@ -115,33 +124,22 @@ public function getPresignedUrl(S3ObjectManager \$manager, \$expires = \"+5 minu
  * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
  * @throws S3Exception if the request fails
  */
-public function upload(\\S3ObjectManager \$manager, \$file)
+public function upload(\$file, \\S3ObjectManager \$manager = null)
 {
-    if (!\$file) {
-        return;
+    if (\$manager == null) {
+        $manager = \$this->getS3ObjectManager();
     }
 
-    \$s3 = \$manager->getS3Client(\$this);
-
-    if (\$region = \$this->getRegion()) {
-        \$s3->setRegion(\$region);
+    if (!\$manager) {
+        throw new \\RuntimeException('No S3ObjectManager instance found.')
     }
 
-    \$response = \$s3->putObject(array(
-        'Bucket' => \$manager->getBucket(\$this),
-        'Key'    => \$this->getKey(),
-        'Body'   => \$file,
-        'ACL'    => CannedAcl::PRIVATE_ACCESS,
-        'ServerSideEncryption' => \$manager->getServerSideEncryption() ? 'AES256' : null,
-        'StorageClass' => \$manager->getReducedRedundancyStorage() ? 'REDUCED_REDUNDANCY' : 'STANDARD'
-    ));
-
-    return \$response;
+    return \$manager->uploadFile(\$this, \$file);
 }
 ";
     }
 
-    protected function addUploadMethod(&$script)
+    protected function addDeleteFileMethod(&$script)
     {
         $script .= "
 /**
@@ -152,30 +150,32 @@ public function upload(\\S3ObjectManager \$manager, \$file)
  * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
  * @throws S3Exception if the request fails
  */
-public function deleteFile(\\S3ObjectManager \$manager)
+public function deleteFile(\\S3ObjectManager \$manager = null)
 {
-    if (!\$this->getKey()) {
-        return;
+    if (\$manager == null) {
+        $manager = \$this->getS3ObjectManager();
     }
 
-    \$s3 = \$manager->getS3Client(\$this);
-
-    \$s3->registerStreamWrapper();
-
-    if (!file_exists(sprintf('s3://%s/%s', \$manager->getBucket(\$this), \$this->getKey()))) {
-        return;
+    if (!\$manager) {
+        throw new \\RuntimeException('No S3ObjectManager instance found.')
     }
 
-    if (\$region = \$this->getRegion()) {
-        \$s3->setRegion(\$region);
+    return \$manager->deleteFile(\$this);
+}
+";
     }
 
-    \$response = \$s3->deleteObject(array(
-        'Bucket' => \$manager->getBucket(\$this),
-        'Key'    => \$this->getKey()
-    ));
-
-    return \$response;
+    protected function addGetS3ObjectManagerMethod(&$script)
+    {
+        $script .= "
+/**
+ * Returns the S3ObjectManager instance assocaited with this object, if there is one.
+ *
+ * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
+ */
+public function getS3ObjectManager()
+{
+    return \$this->s3object_manager;
 }
 ";
     }

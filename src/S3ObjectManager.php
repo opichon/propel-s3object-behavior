@@ -29,4 +29,10 @@ interface S3ObjectManager
      * Whether the object should store its document on S3 using reduced redundancy storage.
      */
     public function getReducedRedundancyStorage(S3Object $object = null);
+
+    public function getKey(S3Object $object);
+
+    public function uploadFile(S3Object $object, $file);
+
+    public function deleteFile(S3Object);
 }
