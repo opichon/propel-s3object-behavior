@@ -100,7 +100,7 @@ public function getReducedRedundancyStorage()
 public function getPresignedUrl(\$expires = \"+5 minutes\", S3ObjectManager \$manager = null)
 {
     if (\$manager == null) {
-        $manager = \$this->getS3ObjectManager();
+        \$manager = \$this->getS3ObjectManager();
     }
 
     if (!\$manager) {
@@ -127,7 +127,7 @@ public function getPresignedUrl(\$expires = \"+5 minutes\", S3ObjectManager \$ma
 public function upload(\$file, \\S3ObjectManager \$manager = null)
 {
     if (\$manager == null) {
-        $manager = \$this->getS3ObjectManager();
+        \$manager = \$this->getS3ObjectManager();
     }
 
     if (!\$manager) {
@@ -153,7 +153,7 @@ public function upload(\$file, \\S3ObjectManager \$manager = null)
 public function deleteFile(\\S3ObjectManager \$manager = null)
 {
     if (\$manager == null) {
-        $manager = \$this->getS3ObjectManager();
+        \$manager = \$this->getS3ObjectManager();
     }
 
     if (!\$manager) {
