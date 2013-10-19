@@ -144,7 +144,7 @@ class BasicS3ObjectManager implements S3ObjectManager
         $s3 = $this->getS3Client($object);
 
         $url = sprintf(
-            '%s/%s?response-content-disposition=attachment; filename=\"%s\"',
+            '%s/%s?response-content-disposition=attachment; filename="%s"',
             $bucket,
             $key,
             $object->getOriginalFilename()
