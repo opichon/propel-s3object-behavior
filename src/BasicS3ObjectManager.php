@@ -181,7 +181,7 @@ class BasicS3ObjectManager implements S3ObjectManager
             'Body'   => $file,
             'ACL'    => CannedAcl::PRIVATE_ACCESS,
             'ServerSideEncryption' => $this->getServerSideEncryption($object) ? 'AES256' : null,
-            'StorageClass' => $manager->getReducedRedundancyStorage($object) ? 'REDUCED_REDUNDANCY' : 'STANDARD'
+            'StorageClass' => $this->getReducedRedundancyStorage($object) ? 'REDUCED_REDUNDANCY' : 'STANDARD'
         ));
 
         return $response;
