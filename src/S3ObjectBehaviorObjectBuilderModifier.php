@@ -51,6 +51,7 @@ protected \$s3object_manager;
         $this->addUploadMethod($script);
         $this->addDeleteFileMethod($script);
         $this->addGetS3ObjectManagerMethod($script);
+        $this->addSetS3ObjectManagerMethod($script);
 
         $this->addSanitizeFilenameMethod($script);
 
@@ -174,6 +175,20 @@ public function deleteFile(\\S3ObjectManager \$manager = null)
 public function getS3ObjectManager()
 {
     return \$this->s3object_manager;
+}
+";
+    }
+
+    protected function addSetS3ObjectManagerMethod(&$script)
+    {
+        $script .= "
+/**
+ * Sets the S3ObjectManager instance assocaited with this object.
+ *
+ */
+public function setS3ObjectManager(S3ObjectManager \$manager)
+{
+    \$this->s3object_manager = \$manager;
 }
 ";
     }
