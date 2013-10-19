@@ -149,7 +149,7 @@ class BasicS3ObjectManager implements S3ObjectManager
         $request = $s3->get($url);
         $signed = $s3->createPresignedUrl($request, $expires);
 
-        return \$signed;
+        return $signed;
     }
 
     /**
