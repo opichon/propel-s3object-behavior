@@ -50,6 +50,7 @@ protected \$s3object_manager;
         $this->addGetPresignedUrlMethod($script);
         $this->addUploadMethod($script);
         $this->addDeleteFileMethod($script);
+        $this->addGetS3ObjectManagerMethod($script);
 
         $this->addSanitizeFilenameMethod($script);
 
