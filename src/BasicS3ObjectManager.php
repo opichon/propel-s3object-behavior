@@ -26,7 +26,10 @@ class BasicS3ObjectManager implements S3ObjectManager
         $reducedRedundancyStorage = null)
     {
         $this->s3 = $s3;
+
         $this->bucket = $bucket;
+
+        $this->region = $region;
 
         $this->sse = null === $serverSideEncryption
             ? static::OFF_DEFAULT
@@ -137,6 +140,7 @@ class BasicS3ObjectManager implements S3ObjectManager
         if (empty($bucket) || empty($key)) {
             return;
         }
+
         $s3 = $this->getS3Client($object);
 
         $url = sprintf(
