@@ -104,7 +104,7 @@ public function getReducedRedundancyStorage()
  * @return string
  * @throws InvalidArgumentException if the request is not associated with this client object
  */
-public function generateKey(S3ObjectManager \$manager = null)
+public function generateKey(\\S3ObjectManager \$manager = null)
 {
     if (\$manager == null) {
         \$manager = \$this->getS3ObjectManager();
