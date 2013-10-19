@@ -13,9 +13,6 @@ class S3ObjectBehaviorObjectBuilderModifier
     {
         $this->builder = $builder;
         $this->builder->declareClasses(
-            'Aws\\S3\\S3Client',
-            'Aws\\S3\\Enum\\CannedAcl',
-            'Aws\\S3\\Exception\\S3Exception',
             '\\S3Object',
             '\\S3ObjectManager'
         );
