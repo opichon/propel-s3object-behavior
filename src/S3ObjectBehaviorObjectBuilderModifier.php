@@ -239,8 +239,8 @@ public function setPathname(\$pathname)
     {
         $peerClassname = $builder->getStubPeerBuilder()->getClassname();
 
-        return "if (\$this->pathname && \$this->getS3ObjectManager()) {
-    \$this->upload(\$this->pathname);
+        return "if (\$this->getPathname() && \$this->getS3ObjectManager()) {
+    \$this->upload(\$this->getPathname());
 }
 ";
     }
