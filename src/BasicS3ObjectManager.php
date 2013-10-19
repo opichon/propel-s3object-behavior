@@ -127,21 +127,12 @@ class BasicS3ObjectManager implements S3ObjectManager
 
     /**
      * Returns the key for the object to use in AWS S3.
-     * This implementation will first check whether the object itself defines a key,
-     * and use that if it does. OTherwise, by default, it will return the object's
-     * sanitized original filename.
      *
      * @return string
      */
     public function getKey(S3Object $object)
     {
-        if ($key = $object->getKey()) {
-            return $key;
-        }
-
-        $slugify = new Slugify(Slugify::MODEARRAY);
-
-        return $slugify->slugify($object->getOrignalFilename());
+        return $object->getKey();
     }
 
     public function getPresignedUrl(S3Object $object, $expires = "+5 minutes")
