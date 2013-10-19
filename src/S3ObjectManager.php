@@ -9,7 +9,7 @@ interface S3ObjectManager
      *
      * @return S3Client
      */
-    public function getS3Client(S3Object $object = null);
+    public function getS3Client(S3Object $object);
 
     /**
      * Returns the AWS S3 bucket to upload an S3Object to.
