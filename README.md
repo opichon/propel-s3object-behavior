@@ -220,7 +220,7 @@ This can occur in the following circumstances:
 
 The S3Object behavior defines the following properties on the class to which it is applied.
 
-#### originalFilename
+#### original_filename
 
 The original filename of the file associated with the object instance.
 
@@ -228,19 +228,19 @@ The original filename of the file associated with the object instance.
 
 The AWS S3 bucket in which the associated file is stored.
 
-### region
+#### region
 
 The AWS region in which the associated file is stored.
 
-### key
+#### key
 
 The  AWS S3 key under which the associated file is stored.
 
-### sse
+#### sse
 
 Whether the associated file on AWS S3 is stored using server-side encryption.
 
-### rrs
+#### rrs
 
 Whether the associated file on AWS S3 is stored using reduced redundancy storage.
 
