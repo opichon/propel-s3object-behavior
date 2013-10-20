@@ -260,7 +260,7 @@ public function setPathname(\$pathname)
 ";
     }
 
-    public function addPreUpdateMethod($script)
+    protected function addPreUpdateMethod(&$script)
     {
         $script .= "
 /**
@@ -280,7 +280,7 @@ public function preUpdate(\\PropelPDO \$con = null)
 }";
     }
 
-    public function addPostUpdateMethod($script)
+    protected function addPostUpdateMethod(&$script)
     {
         $script .= "
 /**
@@ -294,7 +294,7 @@ public function postUpdate(\\PropelPDO \$con = null)
 }";
     }
 
-    public function addPostDeleteMethod($script)
+    protected function addPostDeleteMethod(&$script)
     {
         $script .= "
 /**
