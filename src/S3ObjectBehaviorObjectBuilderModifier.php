@@ -62,7 +62,6 @@ protected \$s3object_manager;
         $this->addSetPathnameMethod($script);
         $this->addFileExistsMethod($script);
         $this->addGenerateKeyMethod($script);
-        $this->addSanitizeFilenameMethod($script);
 
         return $script;
     }
