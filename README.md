@@ -113,7 +113,7 @@ services:
 
 ### Uploading a file
 
-This is typically done via a form that would contain a file input widget. When the form is submitted, set the `originalFilename` and `pathname` properties of the object instance being edited, using the values obtained form the uploaded file. Then save the object instance. As indicated above, you must first obtain an instance of `S3ObjectManager` and set it on the object.
+This is typically done via a form that would contain a file input widget. When the form is submitted, you must set the `originalFilename` and `pathname` properties of the object instance being edited, using the values obtained from the uploaded file. Then save the object instance. As indicated above, you must first obtain an instance of `S3ObjectManager` and set it on the object.
 
 ```php
 $document_manager = /* see above */;
