@@ -280,8 +280,8 @@ Deletes, on S3, the file associated with this object instance.
 
 ### The `S3ObjectManager` interface
 
-The `S3ObjectManager` interface defines most of the logic required to implement the S3Object behavior. Almost all the methods added by the behavior to the object class are implemented by delegating theirlogic to the `S3ObjectManager` instance associated with the object instance.
+The `S3ObjectManager` interface defines most of the logic required to implement the S3Object behavior. Almost all the methods added by the behavior to the object class are implemented by delegating their logic to the `S3ObjectManager` instance associated with the object instance.
 
-`S3ObjectManager` is an interface. The behavior provides a default implementation named `BasicS3ObjectManager`, which is based on the AWS SDK v2.
+`S3ObjectManager` is an interface. The behavior provides a default implementation named `BasicS3ObjectManager`, which is based on the AWS PHP SDK v2.2.
 
-You are of course free to create and use your own implementation of the `S3ObjectManager` interface. In particular, you could create one that uses the AWS SDK v1, if this was required.
+You are free to create and use your own implementation of the `S3ObjectManager` interface. In particular, if for some reason you need to use v1 of the AWS PHP SDK, then it is quite possible to create an implementation of `S3ObjectManager` based on it.
