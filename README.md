@@ -113,7 +113,7 @@ services:
 
 ### Uploading a file
 
-This is typically done via a form that would contain a file input widget. When the form is submitted, you must set the `originalFilename` and `pathname` properties of the object instance being edited, using the values obtained from the uploaded file. Then save the object instance. As indicated above, you must first obtain an instance of `BasicS3ObjectManager` and set it on the object.
+This is typically done via a form that would contain a file input widget. When processing the submitted the form, you must set the `originalFilename` and `pathname` properties of the object instance being edited, using the values obtained from the uploaded file. Then save the object instance. As indicated above, you must first obtain an instance of `BasicS3ObjectManager` and set it on the object.
 
 ```php
 $document_manager = /* see above */;
@@ -133,7 +133,7 @@ $document->save();
 
 Simply call the `getPresignedUrl` method and use that url as you wish.
 
-When that link is clicked, the associated file is downloaded from AWS S3 using the `origin_filename` of the object instance, irrespective of the key under which the file is stored in AWS S3.
+When that link is clicked, the associated file is downloaded from AWS S3 using the `original_filename` of the object instance, irrespective of the key under which the file is stored in AWS S3.
 
 In order to provide a modest degree of obfuscation, we recommend the following pattern:
 
@@ -158,7 +158,7 @@ Header("Location: " . $url);
 
 This approach has 2 benefits:
   * It will avoid confusing your users by showing them a direct link to AWS.
-  * From a security point of view, it allows you to create very short-lived presigned urls (the default is 5 minutes, but it can possibly be reduced even further). Because the presigned url is generated for each request, this causes minimal inconvenience for the user (if the page is too old, he just has to refresh it), while making sure that the link generated, if it is ever obtained by anyone, will be useless.
+  * From a security point of view, it allows you to create very short-lived presigned urls (the default is 5 minutes, but it can possibly be reduced even further). Because the presigned url is generated for each request, this causes minimal inconvenience for the user (if the page is too old, it just needs to be refreshed), while making sure that the link generated, if it is ever obtained by anyone, will be useless.
 
 ### Using defaults
 
@@ -172,9 +172,9 @@ This allows you to create, or configure, separate instances of `BasicS3ObjectMan
 
 ### Key policy
 
-It is the developer's responsibility to design a policy for generating keys that ensures the uniqueness of such keys on AWS S3, or, if uniqueness is not required, for designing a policy that ensures the consistency of the keys with the set of files stored on AWS S3.
+It is the developer's responsibility to design a policy for generating keys that ensures the uniqueness of such keys on AWS S3, or, if uniqueness is not required, to design a policy that ensures the consistency of the keys with the set of files stored on AWS S3.
 
-The key is a unique identifyer for a file within an AWS S3 bucket. It follows that it must be unique (within that bucket).
+The key is a unique identifyer for a file within an AWS S3 bucket.
 
 The bucket and key are also stored as properties of the object instance, and persisted to the database in the class table, under the `bucket` and `key` columns. (Note that the bucket field may be null, if all objects share the same bucket, and if it is defined elsewhere as a default.)
 
@@ -186,7 +186,7 @@ The key for each object instance, whenever the associated file is uploaded to AW
 
 The default implementation returns a slug based on the object's `original_filename` property. Be aware that in some circusmtances this may cause inconsistencies in the keys, if, for example, 2 file names only differ by the case (e.g. a letter is in upper case in one file name, but in lower case in the other; the slugs for each will be identical.)
 
-A simple alternative implementation would be to return the object instance's id. This naturally ensures the unicity of the key. However, it does mean that the files on AWS S3, should you need to manage them directly through the AWS management console, are not so easily recognizable.
+A simple alternative implementation would be to return the object instance's id. This naturally ensures the unicity of the key. However, it does mean that the files on AWS S3, should you need to manage them directly through the AWS management console for example, are not so easily recognizable.
 
 Note that in all cases, the `getPresignedUrl` downloads the file form AWS S3 under its original filename.
 
@@ -198,7 +198,7 @@ The S3Object behavior provides 2 built-in mechanisms to avoid orphaned files.
 
   * When deleting an object, the S3Object behavior will automatically delete the associated file on AWS S3.
 
-  * When saving an object, the S3bject behavior will automatically check if the key has changed, and if so, will delete the file associated with the old key.
+  * When saving an object, the S3Object behavior will automatically check if the key has changed, and if so, will delete the file associated with the old key.
 
 
   This implementation has 2 known limitations:
@@ -212,7 +212,7 @@ A dangling key is a key set on an object instance (or database record) for which
 
 This can occur in the following circumstances:
 
-  1. The file has deleted from AWS S3 through another app, or manually via the AWS console or otherwise. This is beyond the scope of this package.
+  1. The file was deleted from AWS S3 through another app, the API, or manually via the AWS console or otherwise. This is beyond the scope of this package.
 
   2. If your app allows several object instances to share the same file (in other words it does not require unicity of keys), then consistency may be lost when an object is updated with a new file. In such a scenario, the old file will be deleted from AWS S3, but all the other object instances associated with the old file will not have been updated, and so will still have the old key, for which there is now no file on AWS S3. To resolve this, override the `preUpdate`, `postUpdate` and `postDelete` methods generated by the behavior in your class and implement your own logic.
 
