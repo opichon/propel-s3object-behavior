@@ -102,9 +102,9 @@ parameters:
 
 services:
     my_app.document_manager:
-        class: %my_app.document_manager.class%
+        class: '%my_app.document_manager.class%'
         arguments:
-            - @uam_aws.s3
+            - '@uam_aws.s3'
             - '%my_app.documents.aws_bucket%'
             - '%my_app.documents.aws_region%'
             - '%my_app.documents.aws_sse%'
