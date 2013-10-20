@@ -248,7 +248,7 @@ Whether the associated file on AWS S3 is stored using reduced redundancy storage
 
 The local path to the file associated with the object instance. This property is transient (not persisted to the database) and is meant to be used during a file upload (e.g. via a form to edit the object instance).
 
-### s3object_manager
+#### s3object_manager
 
 The `S3ObjectManager` instance associated with the object instance, and to which most methods will be delegated.
 
