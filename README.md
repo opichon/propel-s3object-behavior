@@ -201,16 +201,16 @@ The S3Object behavior provides 2 built-in mechanisms to avoid orphaned files.
   * When saving an object, the S3bject behavior will automatically check if the key has changed, and if so, will delete the file associated with the old key.
 
 
-  This implemenation has 2 known limitations:
+  This implementation has 2 known limitations:
 
   1. It assumes that the bucket is unchanged. If the bucket is changed, the document in the old bucket will not be deleted.
-  2. It may cause dangling keys to occur if your app allows several object instances to share the same file (in other words it does not require unicity of keys). See next chapter below.
+  2. It may cause dangling keys to occur if your app allows several object instances to share the same file (in other words if it does not require unicity of keys). See next chapter below.
 
 ### Dangling keys
 
 A dangling key is a key set on an object instance (or database record) for which no file exists on AWS S3.
 
-This can occur are keys in the following circumstances:
+This can occur in the following circumstances:
 
   1. The file has deleted from AWS S3 through another app, or manually via the AWS console or otherwise. This is beyond the scope of this package.
 
