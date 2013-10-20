@@ -193,7 +193,7 @@ the local path to the file associated with the object instance. This property is
 
 The `S3ObjectManager` instance assocaited with the object instance, and to which most methods will be delegated.
 
-### Property/Method reference
+### Method reference
 
 In addition to the getters and setters for the properties above, the S3OBject behavior adds the follow methods to the class on which it is applied.
 
@@ -219,7 +219,7 @@ Uploads a file to S3.
 
 Deletes, on S3, the file associated with this object instance.
 
-#### The `S3ObjectManager` interface
+### The `S3ObjectManager` interface
 
 The `S3ObjectManager` interface defines most of the logic required to implement the S3Object behavior. Almost all the methods added by the behavior to the object class are implemented by delegating theirlogic to the `S3ObjectManager` instance associated with the object instance.
 
