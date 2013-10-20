@@ -151,8 +151,8 @@ public function getPresignedUrl(\$expires = \"+5 minutes\", S3ObjectManager \$ma
 /**
  * Uploads a file to S3.
  *
- * @param S3ObjectManager an S3ObjectManager instance
  * @param string|stream|Guzzle\Http\EntityBody the path to the file to upload; accepts any valid argument for the 'Body' parameter passed to the S3Client::putObject method.
+ * @param S3ObjectManager an S3ObjectManager instance
  *
  * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
  * @throws S3Exception if the request fails
@@ -293,6 +293,8 @@ if (\$generated_key != \$this->getKey() && \$this->getS3ObjectManager()) {
         $script .= "
 /**
  * Checks whether the file associated with this document exists on AWS S3.
+ *
+ * @param S3ObjectManager an S3ObjectManager instance
  */
  public function fileExists(\\S3ObjectManager \$manager = null)
  {
