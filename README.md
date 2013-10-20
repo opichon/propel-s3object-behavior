@@ -20,6 +20,20 @@ Get the code by adding the following line to your `composer.json` file:
 	}
 ```
 
+Then run:
+
+```
+php composer.phar install
+```
+
+or
+
+```
+php composer.phar update
+```
+
+Configuration
+-------------
 Add the following to your `propel.ini` or `build.properties` file.
 
 ```
@@ -157,6 +171,7 @@ Header("Location: " . $url);
 ```
 
 This approach has 2 benefits:
+
   * It will avoid confusing your users by showing them a direct link to AWS.
   * From a security point of view, it allows you to create very short-lived presigned urls (the default is 5 minutes, but it can possibly be reduced even further). Because the presigned url is generated for each request, this causes minimal inconvenience for the user (if the page is too old, it just needs to be refreshed), while making sure that the link generated, if it is ever obtained by anyone, will be useless.
 
@@ -192,7 +207,7 @@ Note that in all cases, the `getPresignedUrl` downloads the file form AWS S3 und
 
 ### Pruning "orphaned" files
 
-"Orphaned" files are files on AWS S3 that do not match any object instance in your app (or record in your database).
+"Orphaned" files are files on AWS S3 that do not match any object instance in your app (nor any record in your database).
 
 The S3Object behavior provides 2 built-in mechanisms to avoid orphaned files.
 
