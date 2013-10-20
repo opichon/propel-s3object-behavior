@@ -133,6 +133,8 @@ $document->save();
 
 Simply call the `getPresignedUrl` method and use that url as you wish.
 
+When that link is clicked, the associated file is downloaded from AWS S3 using the `origin_filename` of the object instance, irrespective of the key under which the file is stored in AWS S3.
+
 In order to provide a modest degree of obfuscation, we recommend the following pattern:
 
   * in your web pages, use an internal url, i.e. a url pointing to a page in your app's own domain
@@ -140,7 +142,7 @@ In order to provide a modest degree of obfuscation, we recommend the following p
 
 ```php
 
-$id = $request[$_GET]['document_id'];
+$id = $$_GET['document_id'];
 
 $document = DocumentQuery::create()
     ->findPk($id);
@@ -155,16 +157,16 @@ Header("Location: " . $url);
 ```
 
 This approach has 2 benefits:
-  * It will reduce confusion for your users,  who may not understand why they are being redirected to AWS.
-  * From a security point of view, it allows you to create very short-lived presigned urls (the default is 5 minutes, but it can possibly be reduced even further). because the presigned url is generated for each request, this causes minimal inconvenience for the user (if the page is too old, he can simply refresh it), while making sure that the link generated, if it is ever obtained by anyone, will be useless.
+  * It will avoiding confusing your users by showing them a direct link to AWS.
+  * From a security point of view, it allows you to create very short-lived presigned urls (the default is 5 minutes, but it can possibly be reduced even further). Because the presigned url is generated for each request, this causes minimal inconvenience for the user (if the page is too old, he ust has to refresh it), while making sure that the link generated, if it is ever obtained by anyone, will be useless.
 
 ### Using defaults
 
 The S3Object allows you to use a different bucket, or even region, for each object instance. Nevertheless, in most cases, all objects will share the same region and bucket. These can be set as defaults in several ways:
 
-The first way is to update your table and set the appropriate values as defaults. This approach is simple, but has a potentially serious weakness: the defaults apply to all development environments. That is, using a different bucket during development and for production requires some messy switching.
+The first way is to update your table and set the appropriate values as defaults. This approach is simple, but has a practical drawback: the defaults apply to all development environments. In other words, if you want to use different buckets or other settings during development and in production, you have to use separate databases.
 
-The second, and recommended approach, is to use the `BasicS3ObjectManager` for your defaults. When creating an instance of `BasicS3ObjectManager`, the parameters passed ot its constructor will act as defaults for all object instances with which the manager will be associated.
+The second approach, which we recommend, is to use the `BasicS3ObjectManager` class for your defaults. When creating an instance of `BasicS3ObjectManager`, the parameters passed to its constructor will act as defaults for all object instances with which the manager will be associated. See the source code of this class.
 
 This allows you to create, or configure, separate instances of `BasicS3ObjectManager` for each environment: dev or prod, and use a separate bucket for each.
 
@@ -172,37 +174,47 @@ This allows you to create, or configure, separate instances of `BasicS3ObjectMan
 
 It is the developer's responsibility to design a policy for generating keys that ensures the uniqueness of such keys on AWS S3, or, if uniqueness is not required, for designing a policy that ensures the consistency of the keys with the set of files stored on AWS S3.
 
-The key is a unique identifyer for a file within an AWS S3 bucket. It follow that it must be unique (within that bucket).
+The key is a unique identifyer for a file within an AWS S3 bucket. It follows that it must be unique (within that bucket).
 
-The bucket and key are also stored as a property of the object instance, and persisted to the database in the table assocaited with the class, under the `bucket` and `key` columns. (Note: the bucket field may be null, if all objects share the same bucket, and if it is defined elsewhere as a default.)
+The bucket and key are also stored as properties of the object instance, and persisted to the database in the class table, under the `bucket` and `key` columns. (Note that the bucket field may be null, if all objects share the same bucket, and if it is defined elsewhere as a default.)
 
-In most cases, each instance of your class will be associated with a unique file. Therefore the combination [bucket, key] in your table must be unique.
+In most cases, each instance of your class will be associated with a unique file. Therefore the [bucket, key] combination in your table must be unique, reflecting the unicity of the key in that bucket on AWS S3.
 
-In some cases, your app may require that several object instances share the same file. In that case, you may want to have this file stored only once on AWS S3, and you would therefore have to ensure that the key for each object instance concerned is identical.
+In some other cases, your app may require that several object instances share the same file, and you may want to have this file stored only once on AWS S3. In that case, you need to ensure that the key for each object instance concerned is identical.
 
-The key for each object instance, whenever the associated file is first uploaded to AWS S3, is generated by the `generateKey` method. You are free to override this method in your own class.
+The key for each object instance, whenever the associated file is uploaded to AWS S3, is generated by the `generateKey` method, and then set as the object instance's `key` property. You are free to override this method in order to implement your own logic.
 
-The default implementation returns a slug based on the `original_filename` property.
+The default implementation returns a slug based on the object's `original_filename` property. Be aware that in some circusmtances this may cause inconsistencies in the keys, if, for example, 2 file names only differ by the case (e.g. a letter is in upper case in one file name, but in lower case in the other; the slugs for each will be identical.)
 
-A simple alternative implementation would be to return the object instance's id. This naturally ensures the unicity of the key. However, it does mean that the files on AWS S3, should you need to manage them directly through the AWS management console, are not so easily recognizable. Note that in all cases, the `getPresignedUrl` downloads the file form AWS S3 under its original filename.
+A simple alternative implementation would be to return the object instance's id. This naturally ensures the unicity of the key. However, it does mean that the files on AWS S3, should you need to manage them directly through the AWS management console, are not so easily recognizable.
+
+Note that in all cases, the `getPresignedUrl` downloads the file form AWS S3 under its original filename.
 
 ### Pruning "orphaned" files
 
-"Orphaned" files are fileson AWS S3 that do not match any object instance in your app (or record in your database).
+"Orphaned" files are files on AWS S3 that do not match any object instance in your app (or record in your database).
 
-The S3Object behavior provides built-in mechanism to avoid orphaned files.
+The S3Object behavior provides 2 built-in mechanisms to avoid orphaned files.
 
-  * Upon deleting an object, the S3Object behavior will automatically delete the associated file on AWS S3.
+  * When deleting an object, the S3Object behavior will automatically delete the associated file on AWS S3.
 
-  * Upon saving an object, the S3bject behavior will automatically check if the key has changed, and if so, will delete the file associated with the old key.
+  * When saving an object, the S3bject behavior will automatically check if the key has changed, and if so, will delete the file associated with the old key.
 
-Note that the current implementation assumes that the bucket is unchanged. If the bucket is changed, the document in the old bucket will not be deleted.
 
-Note also that if your app does not require unicity of keys, in other words if the same file is shared by several object instances, then consistency may be lost. The old file will have been deleted from AWS S3, but only one record will have been updated. All other records will still have the old key, which now points to nothing. This is a limitation that we are unlikely to address inside the S3Object behavior. To resolve this, override the `preUpdate`, `postUpdate` and `postDelete` methods generated by the behavior in your class.
+  This implemenation has 2 known limitations:
 
-### Direct manipulation of files in AWS S3
+  1. It assumes that the bucket is unchanged. If the bucket is changed, the document in the old bucket will not be deleted.
+  2. It may cause dangling keys to occur if your app allows several object instances to share the same file (in other words it does not require unicity of keys). See next chapter below.
 
-Obviously, if you delete files diretly in AWS S3 via browser extensions or via thw AWS management console, you'll have to update the data in your tables yourself.
+### Dangling keys
+
+A dangling key is a key set on an object instance (or database record) for which no file exists on AWS S3.
+
+This can occur are keys in the following circumstances:
+
+  1. The file has deleted from AWS S3 through another app, or manually via the AWS console or otherwise. This is beyond the scope of this package.
+
+  2. If your app allows several object instances to share the same file (in other words it does not require unicity of keys), then consistency may be lost when an object is updated with a new file. In such a scenario, the old file will be deleted from AWS S3, but all the other objects instances assicated with the old file will not have been updated, and so will still have the old key, for which there is now no file on AWS S3. To resolve this, override the `preUpdate`, `postUpdate` and `postDelete` methods generated by the behavior in your class and implement your own logic.
 
 ### Property reference
 
