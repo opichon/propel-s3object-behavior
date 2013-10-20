@@ -13,7 +13,7 @@ Installation
 
 Get the code by adding the following line to your `composer.json` file:
 
-```json
+```yaml
 	require: {
 		…
 		"uam/propel-s3object-behavior": "dev-master"
@@ -22,7 +22,7 @@ Get the code by adding the following line to your `composer.json` file:
 
 Add the following to your `propel.ini` or `build.properties` file.
 
-```
+```ini
 propel.behavior.s3object.class: S3ObjectBehavior
 ```
 
