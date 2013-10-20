@@ -142,7 +142,7 @@ In order to provide a modest degree of obfuscation, we recommend the following p
 
 ```php
 
-$id = $$_GET['document_id'];
+$id = $_GET['document_id'];
 
 $document = DocumentQuery::create()
     ->findPk($id);
