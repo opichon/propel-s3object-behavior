@@ -13,6 +13,7 @@ class S3ObjectBehaviorObjectBuilderModifier
     {
         $this->builder = $builder;
         $this->builder->declareClasses(
+            '\\PropelPDO',
             '\\S3Object',
             '\\S3ObjectManager'
         );
@@ -62,6 +63,10 @@ protected \$s3object_manager;
         $this->addSetPathnameMethod($script);
         $this->addFileExistsMethod($script);
         $this->addGenerateKeyMethod($script);
+
+        $this->addPreUpdateMethod($script);
+        $this->addPostUpdateMethod($script);
+        $this->addPostDeleteMethod($script);
 
         return $script;
     }
@@ -255,37 +260,52 @@ public function setPathname(\$pathname)
 ";
     }
 
-    public function preSave($builder)
+    public function addPreUpdateMethod($script)
     {
-        $peerClassname = $builder->getStubPeerBuilder()->getClassname();
+        $script .= "
+/**
+ * If the key has changed, deletes the previously associated file on AWS S3
+ * and updates the 'key' property.
+*/
+public function preUpdate(\\PropelPDO \$con = null)
+{
+    \$generated_key = \$this->generateKey();
 
-        return "\$generated_key = \$this->generateKey();
-
-if (\$generated_key != \$this->getKey() && \$this->getS3ObjectManager()) {
-    \$this->deleteFile();
-    \$this->setKey(\$generated_key);
-}
-";
+    if (\$generated_key != \$this->getKey() && \$this->getS3ObjectManager()) {
+        \$this->deleteFile();
+        \$this->setKey(\$generated_key);
     }
 
-    public function postSave($builder)
-    {
-        $peerClassname = $builder->getStubPeerBuilder()->getClassname();
-
-        return "if (\$this->getPathname() && \$this->getS3ObjectManager()) {
-    \$this->upload(\$this->getPathname());
-}
-";
+    return true;
+}";
     }
 
-    public function postDelete($builder)
+    public function addPostUpdateMethod($script)
     {
-        $peerClassname = $builder->getStubPeerBuilder()->getClassname();
+        $script .= "
+/**
+ * Uploads the associated file to AWS S3 when this object instance is updated.
+ */
+public function postUpdate(\\PropelPDO \$con = null)
+{
+    if (\$this->getPathname() && \$this->getS3ObjectManager()) {
+        \$this->upload(\$this->getPathname());
+    }
+}";
+    }
 
-        return "if (\$this->getS3ObjectManager()) {
-    \$this->deleteFile();
-}
-";
+    public function addPostDeleteMethod($script)
+    {
+        $script .= "
+/**
+ * Deletes the associated file on AWS S3 when this object instance is delete.
+ */
+public function postDelete(\\PropelPDO \$con = null)
+{
+    if (\$this->getS3ObjectManager()) {
+        \$this->deleteFile();
+    }
+}";
     }
 
     protected function addFileExistsMethod(&$script)
