@@ -13,7 +13,7 @@ Installation
 
 Get the code by adding the following line to your `composer.json` file:
 
-``` json
+```json
 	require: {
 		…
 		"uam/propel-s3object-behavior": "dev-master"
@@ -35,7 +35,8 @@ Usage
 
 Add the behavior to the relevant table's schema definition:
 
-``` xml schema.xml
+```xml
+
 <?xml version="1.0" encoding="utf-8"?>
 <database name="default" namespace="My\App\lib" defaultIdMethod="native">
     <table name="document" phpName="Document" idMethod="native">
@@ -56,7 +57,8 @@ defaultValue="false" />
   3. Set it on your object instance.
   4. Invoke the methods added by the S3Object behavior to the object instance.
 
-``` php
+```php
+
 $s3 = $s3 = Aws::factory('/path/to/config.php')->get('s3');
 
 $bucket = 'my-bucket';
@@ -90,7 +92,9 @@ $url = $document->getPresignedUrl("+5minutes");
 
 In the example below we use the [UAMAwsBundle](http://knpbundles.com/opichon/UAMAwsBundle) to provide a service for a S3Client.
 
-``` yaml  services.yml
+```yaml
+
+# services.yml
 
 parameters:
     my_app.document_manager.class: BasicS3ObjectManager
@@ -114,7 +118,7 @@ services:
 
 This is typically done via a form that would contain a file input widget. When the form is submitted, set the `originalFilename` and `pathname` properties of the object instance being edited, using the values obtained form the uploaded file. Then save the object instance. You mst, of course, first obtain an instance of `S3ObjectManager` and set it on the object.
 
-``` php
+```php
 $document_manager = …;
 
 $document = DocumentQuery::create()
@@ -137,7 +141,7 @@ In order to provide a modest degree of obfuscation, we recommend the following p
   * in your web pages, use an internal url, that is, a url pointing to a page in your app's own domain
   * server-side, when that page is requested, redirect to the AWS S3 presigned url.
 
-``` php document.php
+```php
 
 $id = $request[$_GET]['document_id'];
 
