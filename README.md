@@ -201,7 +201,7 @@ The S3Object behavior provides 2 built-in mechanisms to avoid orphaned files.
   * When saving an object, the S3Object behavior will automatically check if the key has changed, and if so, will delete the file associated with the old key.
 
 
-  This implementation has 2 known limitations:
+This implementation has 2 known limitations:
 
   1. It assumes that the bucket is unchanged. If the bucket is changed, the document in the old bucket will not be deleted.
   2. It may cause dangling keys to occur if your app allows several object instances to share the same file (in other words if it does not require unicity of keys). See next chapter below.
