@@ -87,7 +87,7 @@ $url = $document->getPresignedUrl("+5minutes");
   3. Set it on your object instance.
   4. Invoke the methods added by the S3Object behavior to the object instance.
 
-In the example below we use the [UAMAwsBundle](http://knpbundles.com/opichon/UAMAwsBundle) to provide a `S3Client` service . You can use any package or code that returns a valid instance of Aws\S3\S3Client as a service.
+In the example below we use the [UAMAwsBundle](http://knpbundles.com/opichon/UAMAwsBundle) to provide a `S3Client` service . You can use any package or code that returns a valid instance of `Aws\S3\S3Client` as a service.
 
 ```yaml
 
