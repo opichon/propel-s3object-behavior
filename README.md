@@ -256,7 +256,7 @@ The `S3ObjectManager` instance associated with the object instance, and to which
 
 In addition to the getters and setters for the properties above, the S3OBject behavior adds the follow methods to the class on which it is applied.
 
-All methods below require an instance of `S3ObjectManager`. This can be either pass explicitly as an argument (most methods below accept such an argument) or the it must be set on the object instance beforehand. The latter is the recommended approach.
+All methods below require an instance of `S3ObjectManager`. This can be either be passed explicitly as an argument (most methods below accept such an argument) or it must be set on the object instance beforehand. The latter is the recommended approach.
 
 #### getPresignedUrl($expires = "+5 minutes")
 
