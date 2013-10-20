@@ -1,7 +1,7 @@
 propel-s3object-behavior
 ========================
 
-The S3Object behavior allows an object to be stored in AWS S3.
+The S3Object behavior allows an object to maintain an association with a file stored in AWS S3.
 
 Requirements
 ------------
@@ -22,7 +22,7 @@ Get the code by adding the following line to your `composer.json` file:
 
 Add the following to your `propel.ini` or `build.properties` file.
 
-```ini
+```
 propel.behavior.s3object.class: S3ObjectBehavior
 ```
 
@@ -40,10 +40,7 @@ Add the behavior to the relevant table's schema definition:
 <?xml version="1.0" encoding="utf-8"?>
 <database name="default" namespace="My\App\lib" defaultIdMethod="native">
     <table name="document" phpName="Document" idMethod="native">
-        <column name="id"          type="integer" primaryKey="true" autoIncrement="false" required="true" />
-        <column name="name"        type="varchar" size="128" required="false" />
-        <column name="description" type="longvarchar" required="false" />
-defaultValue="false" />
+        <!-- you column definitions -->
         <behavior name="s3object" />
     </table>
 </database>
@@ -52,14 +49,14 @@ defaultValue="false" />
 
 #### In your code (standalone)
 
-  1. Create a S3Client
+  1. Create an instance of `Aws\S3\S3Client`
   2. Create an instance of `BasicS3ObjectManager`.
   3. Set it on your object instance.
   4. Invoke the methods added by the S3Object behavior to the object instance.
 
 ```php
 
-$s3 = $s3 = Aws::factory('/path/to/config.php')->get('s3');
+$s3 = Aws::factory('/path/to/config.php')->get('s3');
 
 $bucket = 'my-bucket';
 $region = 'eu-west-1'; // Any AWS region
@@ -85,12 +82,12 @@ $url = $document->getPresignedUrl("+5minutes");
 
 #### In symfony2
 
-  1. Define an S3Client as a service
-  2. Define an instance of `BasicS3ObjectManager` as  a service.
+  1. Create an instance of `Aws\S3\S3Client` and define it as a service
+  2. Create an instance of `BasicS3ObjectManager` and define it as a service.
   3. Set it on your object instance.
   4. Invoke the methods added by the S3Object behavior to the object instance.
 
-In the example below we use the [UAMAwsBundle](http://knpbundles.com/opichon/UAMAwsBundle) to provide a service for a S3Client.
+In the example below we use the [UAMAwsBundle](http://knpbundles.com/opichon/UAMAwsBundle) to provide a `S3Client` service . You can use any package or code that returns a valid instance of Aws\S3\S3Client as a service.
 
 ```yaml
 
@@ -116,7 +113,7 @@ services:
 
 ### Uploading a file
 
-This is typically done via a form that would contain a file input widget. When the form is submitted, set the `originalFilename` and `pathname` properties of the object instance being edited, using the values obtained form the uploaded file. Then save the object instance. You mst, of course, first obtain an instance of `S3ObjectManager` and set it on the object.
+This is typically done via a form that would contain a file input widget. When the form is submitted, set the `originalFilename` and `pathname` properties of the object instance being edited, using the values obtained form the uploaded file. Then save the object instance. As indicated above, you must first obtain an instance of `S3ObjectManager` and set it on the object.
 
 ```php
 $document_manager = /* see above */;
@@ -127,7 +124,7 @@ $document = DocumentQuery::create()
 $document->setS3ObjectManager($document_manager);
 
 $document->setOriginalFilename($filename);
-$document->setpathname($path);
+$document->setPathname($path);
 
 $document->save();
 ```
@@ -138,7 +135,7 @@ Simply call the `getPresignedUrl` method and use that url as you wish.
 
 In order to provide a modest degree of obfuscation, we recommend the following pattern:
 
-  * in your web pages, use an internal url, that is, a url pointing to a page in your app's own domain
+  * in your web pages, use an internal url, i.e. a url pointing to a page in your app's own domain
   * server-side, when that page is requested, redirect to the AWS S3 presigned url.
 
 ```php
@@ -157,9 +154,13 @@ $url = $document->getPresignedUrl();
 Header("Location: " . $url);
 ```
 
+This approach has 2 benefits:
+  * It will reduce confusion for your users,  who may not understand why they are being redirected to AWS.
+  * From a security point of view, it allows you to create very short-lived presigned urls (the default is 5 minutes, but it can possibly be reduced even further). because the presigned url is generated for each request, this causes minimal inconvenience for the user (if the page is too old, he can simply refresh it), while making sure that the link generated, if it is ever obtained by anyone, will be useless.
+
 ### Using defaults
 
-The S3Object allows you to use a different buvcket, or even region, for each object instance. Nevertheless, in most cases, all objects will share the same region and bucket. These can be set as defaults in several ways:
+The S3Object allows you to use a different bucket, or even region, for each object instance. Nevertheless, in most cases, all objects will share the same region and bucket. These can be set as defaults in several ways:
 
 The first way is to update your table and set the appropriate values as defaults. This approach is simple, but has a potentially serious weakness: the defaults apply to all development environments. That is, using a different bucket during development and for production requires some messy switching.
 
