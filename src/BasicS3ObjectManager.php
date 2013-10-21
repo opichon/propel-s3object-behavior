@@ -233,6 +233,6 @@ class BasicS3ObjectManager implements S3ObjectManager
 
         $s3 = $this->getS3Client($object);
 
-        $s3->doesObjectExist($bucket, $key);
+        return $s3->doesObjectExist($bucket, $key);
     }
 }
