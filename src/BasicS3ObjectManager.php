@@ -120,9 +120,15 @@ class BasicS3ObjectManager implements S3ObjectManager
      */
     public function generateKey(S3Object $object)
     {
+        $pathinfo = pathinfo($this->getOriginalFilename());
+
         $slugify = new Slugify(Slugify::MODEARRAY);
 
-        return $slugify->slugify($object->getOriginalFilename());
+        return sprintf(
+            '%s.%s',
+            $slugify->slugify($pathinfo['filename']),
+            $pathinfo['extension']
+        );
     }
 
     /**
@@ -182,7 +188,7 @@ class BasicS3ObjectManager implements S3ObjectManager
         $response = $s3->putObject(array(
             'Bucket' => $bucket,
             'Key'    => $key,
-            'Body'   => $file,
+            'Body'   => fopen($file, 'r'),
             'ACL'    => CannedAcl::PRIVATE_ACCESS,
             'ServerSideEncryption' => $this->getServerSideEncryption($object) ? 'AES256' : null,
             'StorageClass' => $this->getReducedRedundancyStorage($object) ? 'REDUCED_REDUNDANCY' : 'STANDARD'
