@@ -169,7 +169,7 @@ class BasicS3ObjectManager implements S3ObjectManager
     /**
      * Uploads to AWS S3 the file associated with this object.
      */
-    public function uploadFile(S3Object $object, $file)
+    public function uploadFile(S3Object $object, $file, $acl = CannedAcl::PRIVATE_ACCESS)
     {
         if (!$file) {
             return;
@@ -189,7 +189,7 @@ class BasicS3ObjectManager implements S3ObjectManager
             $bucket,
             $key,
             fopen($file, 'r'),
-            CannedAcl::PRIVATE_ACCESS,
+            $acl,
             array(
                 'params' => array(
                     'ServerSideEncryption' => $this->getServerSideEncryption($object) ? 'AES256' : null,
@@ -197,17 +197,6 @@ class BasicS3ObjectManager implements S3ObjectManager
                 )
             )
         );
-
-        /*
-        $response = $s3->putObject(array(
-            'Bucket' => $bucket,
-            'Key'    => $key,
-            'Body'   => fopen($file, 'r'),
-            'ACL'    => CannedAcl::PRIVATE_ACCESS,
-            'ServerSideEncryption' => $this->getServerSideEncryption($object) ? 'AES256' : null,
-            'StorageClass' => $this->getReducedRedundancyStorage($object) ? 'REDUCED_REDUNDANCY' : 'STANDARD'
-        ));
-        */
 
         return $response;
     }

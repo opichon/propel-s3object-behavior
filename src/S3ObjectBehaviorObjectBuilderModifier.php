@@ -162,7 +162,7 @@ public function getPresignedUrl(\$expires = \"+5 minutes\", S3ObjectManager \$ma
  * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
  * @throws S3Exception if the request fails
  */
-public function upload(\$file, \\S3ObjectManager \$manager = null)
+public function upload(\$file, \\S3ObjectManager \$manager = null, \$acl = \CannedAcl::PRIVATE_ACCESS)
 {
     if (\$manager == null) {
         \$manager = \$this->getS3ObjectManager();
@@ -172,7 +172,7 @@ public function upload(\$file, \\S3ObjectManager \$manager = null)
         throw new \\RuntimeException('No S3ObjectManager instance found.');
     }
 
-    return \$manager->uploadFile(\$this, \$file);
+    return \$manager->uploadFile(\$this, \$file, \$acl);
 }
 ";
     }
