@@ -64,7 +64,7 @@ protected \$s3object_manager;
         $this->addFileExistsMethod($script);
         $this->addGenerateKeyMethod($script);
 
-        $this->addPreUpdateMethod($script);
+        $this->addPreSaveMethod($script);
         $this->addPostUpdateMethod($script);
         $this->addPostDeleteMethod($script);
 
@@ -260,7 +260,7 @@ public function setPathname(\$pathname)
 ";
     }
 
-    protected function addPreUpdateMethod(&$script)
+    protected function addPreSaveMethod(&$script)
     {
         $script .= "
 /**
@@ -271,7 +271,7 @@ public function preUpdate(\\PropelPDO \$con = null)
 {
     \$generated_key = \$this->generateKey();
 
-    if (\$generated_key != \$this->getKey() && \$this->getS3ObjectManager()) {
+    if (!empty(\$generated_key) && \$generated_key != \$this->getKey() && \$this->getS3ObjectManager()) {
         \$this->deleteFile();
     }
 
