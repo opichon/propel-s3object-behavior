@@ -13,6 +13,7 @@ class S3ObjectBehaviorObjectBuilderModifier
     {
         $this->builder = $builder;
         $this->builder->declareClasses(
+            '\\Aws\S3\Enum\CannedAcl',
             '\\PropelPDO',
             '\\S3Object',
             '\\S3ObjectManager'
