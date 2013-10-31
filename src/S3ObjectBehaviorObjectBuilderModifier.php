@@ -269,9 +269,10 @@ public function setPathname(\$pathname)
 */
 public function preSave(\\PropelPDO \$con = null)
 {
+    \$current_key = \$this->getKey();
     \$generated_key = \$this->generateKey();
 
-    if (!empty(\$generated_key) && \$generated_key != \$this->getKey() && \$this->getS3ObjectManager()) {
+    if (!empty(\$current_key) && \$generated_key != \$current_key && \$this->getS3ObjectManager()) {
         \$this->deleteFile();
     }
 
