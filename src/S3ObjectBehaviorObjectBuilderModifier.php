@@ -267,7 +267,7 @@ public function setPathname(\$pathname)
  * If the key has changed, deletes the previously associated file on AWS S3
  * and updates the 'key' property.
 */
-public function preUpdate(\\PropelPDO \$con = null)
+public function preSave(\\PropelPDO \$con = null)
 {
     \$generated_key = \$this->generateKey();
 
