@@ -171,7 +171,7 @@ class BasicS3ObjectManager implements S3ObjectManager
      */
     public function uploadFile(S3Object $object, $file, $acl = CannedAcl::PRIVATE_ACCESS)
     {
-        if (!$file) {
+        if (!$file || !file_exists($file)) {
             return;
         }
 
