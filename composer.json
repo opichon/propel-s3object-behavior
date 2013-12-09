@@ -11,7 +11,7 @@
 	],
 	"require": {
 		"propel/propel1": "~1.6",
-		"aws/aws-sdk-php": "~2.2",
+		"aws/aws-sdk-php": "~2.0",
 		"cocur/slugify": "~0.2"
 	},
 	"autoload": {
