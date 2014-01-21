@@ -66,7 +66,7 @@ protected \$s3object_manager;
         $this->addGenerateKeyMethod($script);
 
         $this->addPreSaveMethod($script);
-        $this->addPostUpdateMethod($script);
+        $this->addPostSaveMethod($script);
         $this->addPostDeleteMethod($script);
 
         return $script;
@@ -283,7 +283,7 @@ public function preSave(\\PropelPDO \$con = null)
 }";
     }
 
-    protected function addPostUpdateMethod(&$script)
+    protected function addPostSaveMethod(&$script)
     {
         $script .= "
 /**
