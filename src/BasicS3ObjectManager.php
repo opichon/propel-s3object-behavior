@@ -157,7 +157,7 @@ class BasicS3ObjectManager implements S3ObjectManager
             '%s/%s?response-content-disposition=attachment; filename="%s"',
             $bucket,
             $key,
-            $object->getOriginalFilename()
+            urlencode($object->getOriginalFilename())
         );
 
         $request = $s3->get($url);
