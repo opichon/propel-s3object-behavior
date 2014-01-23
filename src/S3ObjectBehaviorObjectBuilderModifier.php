@@ -289,7 +289,7 @@ public function preSave(\\PropelPDO \$con = null)
 /**
  * Uploads the associated file to AWS S3 when this object instance is updated.
  */
-public function postUpdate(\\PropelPDO \$con = null)
+public function postSave(\\PropelPDO \$con = null)
 {
     if (\$this->getPathname() && \$this->getS3ObjectManager()) {
         \$this->upload(\$this->getPathname());
