@@ -122,7 +122,7 @@ class BasicS3ObjectManager implements S3ObjectManager
     {
         $pathinfo = pathinfo($object->getOriginalFilename());
 
-        $slugify = new Slugify(Slugify::MODEARRAY);
+        $slugify = new Slugify();
 
         return sprintf(
             '%s.%s',

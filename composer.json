@@ -12,14 +12,14 @@
 	"require": {
 		"propel/propel1": "~1.6",
 		"aws/aws-sdk-php": "~2.4",
-		"cocur/slugify": "~0.2"
+		"cocur/slugify": "@stable"
 	},
 	"autoload": {
 		"classmap": ["src/"]
 	},
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "1.1.x-dev"
         }
     }
 }
