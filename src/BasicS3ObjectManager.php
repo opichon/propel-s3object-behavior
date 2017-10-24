@@ -41,11 +41,6 @@ class BasicS3ObjectManager implements S3ObjectManager
 
     public function getS3Client(S3Object $object)
     {
-        //region is immutable in aws-sdk v3
-
-        //$region = $this->getRegion($object);
-        //$this->s3->setRegion($region);
-
         return $this->s3;
     }
 
