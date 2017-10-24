@@ -1,7 +1,6 @@
 <?php
 
 use Aws\S3\S3Client;
-use Aws\S3\Enum\CannedAcl;
 
 use Cocur\Slugify\Slugify;
 
@@ -155,15 +154,13 @@ class BasicS3ObjectManager implements S3ObjectManager
 
         $s3 = $this->getS3Client($object);
 
-        $url = sprintf(
-            '%s/%s?response-content-disposition=attachment; filename="%s"',
-            $bucket,
-            $key,
-            urlencode($object->getOriginalFilename())
-        );
+        $cmd = $s3->getCommand('GetObject', [
+           'Bucket' => $bucket,
+           'Key' => $key,
+        ]);
 
-        $request = $s3->get($url);
-        $signed = $s3->createPresignedUrl($request, $expires);
+        $request = $s3->createPresignedRequest($cmd, $expires);
+        $signed = (string) $request->getUri();
 
         return $signed;
     }
@@ -171,7 +168,7 @@ class BasicS3ObjectManager implements S3ObjectManager
     /**
      * Uploads to AWS S3 the file associated with this object.
      */
-    public function uploadFile(S3Object $object, $file, $acl = CannedAcl::PRIVATE_ACCESS)
+    public function uploadFile(S3Object $object, $file, $acl = 'private')
     {
         if (!$file || !file_exists($file)) {
             return;
