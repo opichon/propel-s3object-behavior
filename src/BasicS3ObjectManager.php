@@ -1,7 +1,6 @@
 <?php
 
-use Aws\S3\S3Client;
-
+use Aws\S3\S3MultiRegionClient;
 use Cocur\Slugify\Slugify;
 
 class BasicS3ObjectManager implements S3ObjectManager
@@ -18,7 +17,7 @@ class BasicS3ObjectManager implements S3ObjectManager
     protected $rrs;
 
     public function __construct(
-        S3Client $s3,
+        S3MultiRegionClient $s3,
         $bucket = null,
         $region = null,
         $serverSideEncryption = null,
@@ -150,8 +149,9 @@ class BasicS3ObjectManager implements S3ObjectManager
         $s3 = $this->getS3Client($object);
 
         $cmd = $s3->getCommand('GetObject', [
-           'Bucket' => $bucket,
-           'Key' => $key,
+            'Bucket' => $bucket,
+            'Key' => $key,
+            '@region' => $this->getRegion($object),
         ]);
 
         $request = $s3->createPresignedRequest($cmd, $expires);
@@ -219,7 +219,8 @@ class BasicS3ObjectManager implements S3ObjectManager
 
         $response = $s3->deleteObject(array(
             'Bucket' => $bucket,
-            'Key'    => $key
+            'Key'    => $key,
+            '@region' => $this->getRegion($object),
         ));
 
        return $response;
