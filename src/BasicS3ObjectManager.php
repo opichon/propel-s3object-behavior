@@ -1,8 +1,6 @@
 <?php
 
-use Aws\S3\S3Client;
-use Aws\S3\Enum\CannedAcl;
-
+use Aws\S3\S3MultiRegionClient;
 use Cocur\Slugify\Slugify;
 
 class BasicS3ObjectManager implements S3ObjectManager
@@ -19,7 +17,7 @@ class BasicS3ObjectManager implements S3ObjectManager
     protected $rrs;
 
     public function __construct(
-        S3Client $s3,
+        S3MultiRegionClient $s3,
         $bucket = null,
         $region = null,
         $serverSideEncryption = null,
@@ -42,9 +40,6 @@ class BasicS3ObjectManager implements S3ObjectManager
 
     public function getS3Client(S3Object $object)
     {
-        $region = $this->getRegion($object);
-        $this->s3->setRegion($region);
-
         return $this->s3;
     }
 
@@ -153,15 +148,14 @@ class BasicS3ObjectManager implements S3ObjectManager
 
         $s3 = $this->getS3Client($object);
 
-        $url = sprintf(
-            '%s/%s?response-content-disposition=attachment; filename="%s"',
-            $bucket,
-            $key,
-            urlencode($object->getOriginalFilename())
-        );
+        $cmd = $s3->getCommand('GetObject', [
+            'Bucket' => $bucket,
+            'Key' => $key,
+            '@region' => $this->getRegion($object),
+        ]);
 
-        $request = $s3->get($url);
-        $signed = $s3->createPresignedUrl($request, $expires);
+        $request = $s3->createPresignedRequest($cmd, $expires);
+        $signed = (string) $request->getUri();
 
         return $signed;
     }
@@ -169,7 +163,7 @@ class BasicS3ObjectManager implements S3ObjectManager
     /**
      * Uploads to AWS S3 the file associated with this object.
      */
-    public function uploadFile(S3Object $object, $file, $acl = CannedAcl::PRIVATE_ACCESS)
+    public function uploadFile(S3Object $object, $file, $acl = 'private')
     {
         if (!$file || !file_exists($file)) {
             return;
@@ -225,7 +219,8 @@ class BasicS3ObjectManager implements S3ObjectManager
 
         $response = $s3->deleteObject(array(
             'Bucket' => $bucket,
-            'Key'    => $key
+            'Key'    => $key,
+            '@region' => $this->getRegion($object),
         ));
 
        return $response;

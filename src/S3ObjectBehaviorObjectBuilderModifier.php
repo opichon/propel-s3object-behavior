@@ -13,7 +13,6 @@ class S3ObjectBehaviorObjectBuilderModifier
     {
         $this->builder = $builder;
         $this->builder->declareClasses(
-            '\\Aws\\S3\\Enum\\CannedAcl',
             '\\PropelPDO',
             '\\S3Object',
             '\\S3ObjectManager'
@@ -163,7 +162,7 @@ public function getPresignedUrl(\$expires = \"+5 minutes\", S3ObjectManager \$ma
  * @return Guzzle\Service\Resource\Model reponse from S3Client request via Guzzle
  * @throws S3Exception if the request fails
  */
-public function upload(\$file, \\S3ObjectManager \$manager = null, \$acl = CannedAcl::PRIVATE_ACCESS)
+public function upload(\$file, \\S3ObjectManager \$manager = null, \$acl = 'private')
 {
     if (\$manager == null) {
         \$manager = \$this->getS3ObjectManager();
