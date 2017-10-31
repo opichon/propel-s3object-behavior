@@ -151,7 +151,7 @@ class BasicS3ObjectManager implements S3ObjectManager
         $s3 = $this->getS3Client($object);
 
         $cmd = $s3->getCommand('GetObject', [
-            'Bucket' =>$options['bucket'],
+            'Bucket' => $options['bucket'],
             'Key' => $options['key'],
             '@region' => $this->getRegion($object),
         ]);
