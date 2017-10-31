@@ -146,11 +146,13 @@ class BasicS3ObjectManager implements S3ObjectManager
             return;
         }
 
+        $options = $this->updateBucketAndKeyName($bucket, $key);
+
         $s3 = $this->getS3Client($object);
 
         $cmd = $s3->getCommand('GetObject', [
-            'Bucket' => $bucket,
-            'Key' => $key,
+            'Bucket' =>$options['bucket'],
+            'Key' => $options['key'],
             '@region' => $this->getRegion($object),
         ]);
 
@@ -177,11 +179,13 @@ class BasicS3ObjectManager implements S3ObjectManager
             return;
         }
 
+        $options = $this->updateBucketAndKeyName($bucket, $key);
+
         $s3 = $this->getS3Client($object);
 
         $response = $s3->upload(
-            $bucket,
-            $key,
+            $options['bucket'],
+            $options['key'],
             fopen($file, 'r'),
             $acl,
             array(
@@ -211,15 +215,17 @@ class BasicS3ObjectManager implements S3ObjectManager
             return;
         }
 
+        $options = $this->updateBucketAndKeyName($bucket, $key);
+
         $s3 = $this->getS3Client($object);
 
-        if (!$s3->doesObjectExist($bucket, $key)) {
+        if (!$s3->doesObjectExist($options['bucket'], $options['key'])) {
             return;
         }
 
         $response = $s3->deleteObject(array(
-            'Bucket' => $bucket,
-            'Key'    => $key,
+            'Bucket' => $options['bucket'],
+            'Key'    => $options['key'],
             '@region' => $this->getRegion($object),
         ));
 
@@ -236,8 +242,24 @@ class BasicS3ObjectManager implements S3ObjectManager
             return false;
         }
 
+        $options = $this->updateBucketAndKeyName($bucket, $key);
+
         $s3 = $this->getS3Client($object);
 
-        return $s3->doesObjectExist($bucket, $key);
+        return $s3->doesObjectExist($options['bucket'], $options['key']);
+    }
+
+    protected function updateBucketAndKeyName($bucket, $key)
+    {
+        preg_match('/^([^\/]+)\/(.*)$/', $bucket, $matches);
+
+        $bucket = $matches[1];
+
+        $key = $matches[2] . '/' . $key;
+
+        return array(
+            'bucket' => $bucket,
+            'key' => $key,
+        );
     }
 }
