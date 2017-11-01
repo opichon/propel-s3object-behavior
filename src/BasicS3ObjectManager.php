@@ -154,9 +154,11 @@ class BasicS3ObjectManager implements S3ObjectManager
             'Bucket' => $options['bucket'],
             'Key' => $options['key'],
             '@region' => $this->getRegion($object),
+            'ResponseContentDisposition' => sprintf('attachment; filename="%s"', urlencode($object->getOriginalFilename())),
         ]);
 
         $request = $s3->createPresignedRequest($cmd, $expires);
+
         $signed = (string) $request->getUri();
 
         return $signed;
