@@ -251,7 +251,7 @@ class BasicS3ObjectManager implements S3ObjectManager
 
     protected function updateBucketAndKeyName($bucket, $key)
     {
-        preg_match('/^([^\/]+)\/(.*)$/', $bucket, $matches);
+        preg_match('/^([^\/]+)\/?(.*)$/', $bucket, $matches);
 
         $bucket = $matches[1];
 
