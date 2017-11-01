@@ -257,7 +257,9 @@ class BasicS3ObjectManager implements S3ObjectManager
 
         $bucket = $matches[1];
 
-        $key = $matches[2] . '/' . $key;
+        if ($matches[2] != '') {
+            $key = $matches[2] . '/' . $key;
+        }
 
         return array(
             'bucket' => $bucket,
